@@ -8,10 +8,11 @@
 public class Percolation {
 
     private boolean[][] matrix;
-    private int matrixLength;
-    private WeightedQuickUnionUF weightQuickUnion;
-    private int testUpperBox;
-    private int testLowerBox;
+    private final int matrixLength;
+    private final WeightedQuickUnionUF weightQuickUnion;
+    private final WeightedQuickUnionUF stopBackWash;
+    private final int testUpperBox;
+    private final int testLowerBox;
     private int openedBoxes;
 
     // creates n-by-n grid, with all sites initially blocked
@@ -34,6 +35,7 @@ public class Percolation {
 
         this.matrixLength = n;
         this.weightQuickUnion = new WeightedQuickUnionUF(n*n + 2);
+        this.stopBackWash = new WeightedQuickUnionUF(n*n + 1);
         this.testUpperBox = 0;
         this.testLowerBox = n*n + 1;
         this.openedBoxes = 0;
@@ -54,6 +56,7 @@ public class Percolation {
             // if row is equal to 1, than open this and union it with testUpperBox
             if (row == 1) {
                 weightQuickUnion.union(indexInUnionArray, testUpperBox);
+                stopBackWash.union(indexInUnionArray, testUpperBox);
             }
 
             // if row is equal to length of matrix or n, than open this and union it with testLowerBox
@@ -66,6 +69,7 @@ public class Percolation {
                 if (isOpen(row - 1, col)) {
                     int indexUpperNeigh = numberForRowAndCol(row - 1, col);
                     weightQuickUnion.union(indexInUnionArray, indexUpperNeigh);
+                    stopBackWash.union(indexInUnionArray, indexUpperNeigh);
                 }
             }
 
@@ -74,6 +78,7 @@ public class Percolation {
                 if (isOpen(row + 1, col)) {
                     int indexBottomNeigh = numberForRowAndCol(row + 1, col);
                     weightQuickUnion.union(indexInUnionArray, indexBottomNeigh);
+                    stopBackWash.union(indexInUnionArray, indexBottomNeigh);
                 }
             }
 
@@ -82,6 +87,7 @@ public class Percolation {
                 if (isOpen(row, col - 1)) {
                     int indexLeftNeigh = numberForRowAndCol(row, col - 1);
                     weightQuickUnion.union(indexInUnionArray, indexLeftNeigh);
+                    stopBackWash.union(indexInUnionArray, indexLeftNeigh);
                 }
             }
 
@@ -91,6 +97,7 @@ public class Percolation {
                 if (isOpen(row, col + 1)) {
                     int indexRightNeigh = numberForRowAndCol(row, col + 1);
                     weightQuickUnion.union(indexInUnionArray, indexRightNeigh);
+                    stopBackWash.union(indexInUnionArray, indexRightNeigh);
                 }
             }
         }
@@ -119,7 +126,7 @@ public class Percolation {
         int thisBox = numberForRowAndCol(row, col);
         // return this.weightQuickUnion.connected(this.testUpperBox, thisBox); // beacuse connected method is deprceated
 
-        return this.weightQuickUnion.find(this.testUpperBox) == this.weightQuickUnion.find(thisBox);
+        return this.stopBackWash.find(this.testUpperBox) == this.stopBackWash.find(thisBox);
     }
 
     // returns the number of open sites
@@ -138,7 +145,7 @@ public class Percolation {
     // test client (optional)
      public static void main(String[] args)
      {
-
+        // don't need test client
      }
 
 
